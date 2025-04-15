@@ -1,13 +1,18 @@
 //!HOOK MAIN
 //!BIND HOOKED
 //!DESC VHS Effect
+//!WIDTH HOOKED.w
+//!HEIGHT HOOKED.h
 
 // - VHS shader by hunterk
 // - Adapted for MPV by shmup
 
+#define resolution vec2(HOOKED_size.x, HOOKED_size.y)
+#define resolutionFactor min(resolution.y / 1080.0, 1.0)
+
 // parameters - adjust these values to tweak the effect
-#define wiggle 3.0
-#define smear 0.5
+#define wiggle (3.0 * resolutionFactor)
+#define smear (0.5 * resolutionFactor)
 
 // timing functions
 #define iTime (frame / 60.0)
@@ -40,7 +45,7 @@ vec3 Blur(sampler2D tex, vec2 uv, float d) {
   vec2 PixelOffset = vec2(d+.0005*t, 0);
 
   float Start = 2.0 / 14.0;
-  vec2 Scale = 0.66 * 4.0 * 2.0 * PixelOffset.xy;
+  vec2 Scale = 0.66 * 4.0 * 2.0 * PixelOffset.xy * resolutionFactor;
 
   vec3 N0 = texture(tex, uv + Circle(Start, 14.0, 0.0) * Scale).rgb;
   vec3 N1 = texture(tex, uv + Circle(Start, 14.0, 1.0) * Scale).rgb;
@@ -87,7 +92,7 @@ float onOff(float a, float b, float c, float framecount) {
 vec2 jumpy(vec2 uv, float framecount) {
   vec2 look = uv;
   float window = 1.0/(1.0+80.0*(look.y-mod(framecount/4.0,1.0))*(look.y-mod(framecount/4.0,1.0)));
-  look.x += 0.05 * sin(look.y*10.0 + framecount)/20.0*onOff(4.0,4.0,0.3, framecount)*(0.5+cos(framecount*20.0))*window;
+  look.x += 0.05 * sin(look.y*10.0 + framecount)/20.0*onOff(4.0,4.0,0.3, framecount)*(0.5+cos(framecount*20.0))*window * resolutionFactor;
   float vShift = (0.1*wiggle) * 0.4*onOff(2.0,3.0,0.9, framecount)*(sin(framecount)*sin(framecount*20.0) +
       (0.5 + 0.1*sin(framecount*200.0)*cos(framecount)));
   look.y = mod(look.y - 0.01 * vShift, 1.0);
@@ -102,12 +107,11 @@ vec4 hook() {
 
   float s = 0.0001 * -d + 0.0001 * wiggle * sin(iTime);
 
-  float e = min(0.30,pow(max(0.0,cos(uv.y*4.0+0.3)-0.75)*(s+0.5)*1.0,3.0))*25.0;
-  float r = (iTime*(2.0*s));
-  uv.x+=abs(r*pow(min(0.003,(-uv.y+(0.01*mod(iTime, 17.0))))*3.0,2.0));
+  float e = min(0.30,pow(max(0.0,cos(uv.y*4.0+0.3)-0.75)*(s+0.5)*1.0,3.0))*25.0 * resolutionFactor;
+  uv.x+=abs(s*pow(min(0.003,(-uv.y+(0.01*mod(iTime, 17.0))))*3.0,2.0)) * resolutionFactor;
+  float c = max(0.0001,0.002*d) * smear * resolutionFactor;
 
   d=0.051+abs(sin(s/4.0));
-  float c = max(0.0001,0.002*d) * smear;
   vec2 uvo = uv;
   vec4 final;
   final.rgb = Blur(HOOKED_raw, uv, c+c*(uv.x));

@@ -43,4 +43,7 @@ mpv $FULLSCREEN \
   --panscan=1.0 \
   --glsl-shader="$SHADER_PATH" \
   --profile=gpu-hq \
+  --window-scale=1.0 \
+  --autofit-larger=90%x90% \
+  --autofit-smaller=40%x40% \
   "$VIDEO_PATH"
