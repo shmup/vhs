@@ -3,7 +3,7 @@
 // adapted from ompuco's more AVdistortion shadertoy:
 // https://www.shadertoy.com/view/XlsczN
 
-// Parameter lines go here:
+#version 120
 #pragma parameter wiggle "Wiggle" 0.0 0.0 10.0 1.0
 #pragma parameter smear "Chroma Smear" 0.5 0.0 1.0 0.05
 
