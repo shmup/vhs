@@ -38,9 +38,9 @@ fi
 
 echo "Playing $VIDEO_PATH with VHS effects..."
 mpv $FULLSCREEN \
-  --video-unscaled=yes \
-  --keepaspect=yes \
-  --vf=lavfi="[crop=iw:iw*3/4]" \
+  --no-keepaspect-window \
+  --vf=crop=ih*4/3:ih:iw/2-ih*4/3/2:0 \
+  --panscan=1.0 \
   --glsl-shader="$SHADER_PATH" \
   --profile=gpu-hq \
   "$VIDEO_PATH"
